@@ -55,11 +55,16 @@ def main(dict_path, corpus_path):
         bigram = bigram.decode()
         a, b = bigram.split()
         try:
-            best_rhyme = rd.best_rhymes(b, n=1)[0][0].lower()
+            best_rhymes = rd.best_rhymes(b, n=10)[0]
         except KeyError:
             print(f'unknown word: {b}')
             continue
-        print(f'{a} -> {best_rhyme} because "{a} {b}"')
+        for rhyme in best_rhymes:
+            rhyme = rhyme.lower()
+            # ensure the matching words aren't sub-words of each other
+            if rhyme in b or b in rhyme:
+                continue
+        print(f'{a} -> {rhyme} because "{a} {b}"')
 
 
 if __name__ == '__main__':
