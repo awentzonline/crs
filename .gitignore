@@ -1,0 +1,15 @@
+.DS_Store
+env/
+*.egg-info/
+build/
+dist/
+.tmp/
+__pycache__/
+tmp_env/
+nltk_data/
+*.d2v
+.env
+*flymd*
+.coverage
+docs/_build/
+*.pyc
