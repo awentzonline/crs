@@ -38,7 +38,7 @@ def get_phrases(corpus, threshold=0.6, min_count=2):
 @click.command()
 @click.argument('dict_path')
 @click.argument('corpus_path')
-def main(dict_path, corpus_path):
+def main(dict_path, corpus_path, min_word_length=3):
     """
     Steps:
      * Find popular bigrams in a corpus (B0,B1)
@@ -54,6 +54,8 @@ def main(dict_path, corpus_path):
     for bigram in bigrams:
         bigram = bigram.decode()
         a, b = bigram.split()
+        if len(b) < min_word_length or len(a) < min_word_length:
+            continue
         try:
             best_rhymes = rd.best_rhymes(b, n=10)[0]
         except KeyError:
@@ -63,6 +65,8 @@ def main(dict_path, corpus_path):
             rhyme = rhyme.lower()
             # ensure the matching words aren't sub-words of each other
             if rhyme in b or b in rhyme:
+                continue
+            if len(rhyme) < min_word_length:
                 continue
         print(f'{a} -> {rhyme} because "{a} {b}"')
 
