@@ -2,6 +2,8 @@ import re
 
 import click
 from gensim.models.phrases import Phrases, Phraser
+import nltk
+from nltk.corpus import stopwords
 
 from rhymedict import RhymingDict
 
@@ -22,6 +24,7 @@ def load_corpus(path):
 
 
 def get_phrases(corpus, threshold=0.6, min_count=2):
+    nltk.download('stopwords')
     phraser_model = Phrases(
         corpus,
         min_count=min_count,
@@ -29,7 +32,8 @@ def get_phrases(corpus, threshold=0.6, min_count=2):
         scoring='npmi',
         max_vocab_size=40000000,  # default
         delimiter=b'_',
-        progress_per=10000
+        progress_per=10000,
+        common_terms=set(stopwords.words('english'))
     )
     phraser = Phraser(phraser_model)
     return phraser, phraser_model
@@ -53,7 +57,8 @@ def main(dict_path, corpus_path, min_word_length=3):
     bigrams = set([gram for gram, _ in phraser_model.export_phrases(corpus)])
     for bigram in bigrams:
         bigram = bigram.decode()
-        a, b = bigram.split()
+        split_bigram = bigram.split()
+        a, b = split_bigram[0], split_bigram[-1]
         if len(b) < min_word_length or len(a) < min_word_length:
             continue
         try:
@@ -68,7 +73,7 @@ def main(dict_path, corpus_path, min_word_length=3):
                 continue
             if len(rhyme) < min_word_length:
                 continue
-        print(f'{a} -> {rhyme} because "{a} {b}"')
+        print(f'{a} -> {rhyme} because "{a} {b}" from the full phrase "{bigram}"')
 
 
 if __name__ == '__main__':
